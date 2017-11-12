@@ -31,7 +31,7 @@ class AssetManagerPlugin implements PluginInterface, Capable
 	
 	public function activate(Composer $composer, IOInterface $io)
 	{
-		$io->write("Initializing Asset-Manager Plugin...");
+		$io->write("Initializing Asset-Manager Plugin...",true,$io::VERY_VERBOSE);
 			
 		$this->setAssetManager(new AssetManager($composer,$io));
 		

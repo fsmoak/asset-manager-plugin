@@ -64,6 +64,25 @@ class InitCommand extends AbstactCommand
 					AssetManager::METHOD_COPY
 				], $config->getMethod())));
 
+		if (!$config->getEnviroment())
+		{
+			$io->write("<info>Asset Enviroment not set! Please select a Branch name from the Repository.</info>");
+		}
+		$config->setEnviroment($io->askAndValidate("Asset Enviroment [" . $config->getEnviroment() . "]: ", function($env) use ($io) {
+			if (!empty($env)) return($env);
+			throw new \Exception($env . " is not a branchname!");
+		}, NULL, $config->getEnviroment()));
+		$io->write("<info>Using " . $config->getEnviroment() . " as enviroment from now on.</info>");
+		
+		if (file_exists(".gitignore") && !in_array("asset-manager.json",explode("\n",file_get_contents(".gitignore"))))
+		{
+			if ($io->askConfirmation("Add asset-manager.json to .gitignore? [Y/n]",true))
+			{
+				file_put_contents(".gitignore","\nasset-manager.json",FILE_APPEND);
+			}
+		}
+		
 		$config->saveComposerJson();
+		$config->saveAssetManagerJson();
 	}
 }
