@@ -1,0 +1,18 @@
+{
+	"name": "fsmoak/asset-manager-plugin",
+	"description": "Manages your assets (binary-files, database, etc...) in a Git (LFS) Repository with branches for your workflow stages (production, staging, development).",
+	"type": "composer-plugin",
+	"license": "MIT",
+	"autoload": {
+		"psr-0": {"FSmoak\\AssetManagerPlugin": "src/"}
+	},
+	"extra": {
+		"class": "FSmoak\\AssetManagerPlugin\\AssetManagerPlugin"
+	},
+	"require": {
+		"composer-plugin-api": "^1.0"
+	},
+	"require-dev": {
+		"composer/composer": "^1.3"
+	}
+}
