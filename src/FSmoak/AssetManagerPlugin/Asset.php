@@ -1,9 +1,20 @@
 <?php
+/**
+ *
+ *  * This file is part of Asset-Manager Composer-Plugin
+ *  *
+ *  * (c) FSmoak <marieschreiber84@gmail.com>
+ *  *
+ *  * For the full copyright and license information, please view the LICENSE
+ *  * file that was distributed with this source code.
+ *  
+ */
+
 namespace FSmoak\AssetManagerPlugin;
 
 use const DIRECTORY_SEPARATOR;
 use Exception;
-use function file;
+
 use function file_exists;
 use function getcwd;
 use function str_replace;
@@ -13,6 +24,11 @@ use Webmozart\PathUtil\Path;
 
 class Asset extends SplFileInfo
 {
+	/**
+	 * Asset constructor.
+	 * @param $file
+	 * @throws \Exception
+	 */
 	public function __construct($file)
 	{
 		$cwd = getcwd()."/";
@@ -84,7 +100,7 @@ class Asset extends SplFileInfo
 				return(false);
 			}
 		}
-		exec("ln -s ".$this->getRelativePathFromDeployedToRepository()." ".$this->getDeployedPathname(),$ouput,$exitcode);
+		exec("ln -s ".$this->getRelativePathFromDeployedToRepository()." ".$this->getDeployedPathname(),$output,$exitcode);
 		return($exitcode);
 	}
 	public function moveFileToRepository()

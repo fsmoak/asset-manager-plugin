@@ -1,4 +1,15 @@
 <?php
+/**
+ *
+ *  * This file is part of Asset-Manager Composer-Plugin
+ *  *
+ *  * (c) FSmoak <marieschreiber84@gmail.com>
+ *  *
+ *  * For the full copyright and license information, please view the LICENSE
+ *  * file that was distributed with this source code.
+ *  
+ */
+
 namespace FSmoak\AssetManagerPlugin;
 
 /**
@@ -102,7 +113,6 @@ class Config
 	}
 
 	/**
-	 * @param $composerJson
 	 */
 	public function loadAssetManagerJson()
 	{
@@ -126,7 +136,7 @@ class Config
 	/**
 	 * @return string|null
 	 */
-	public function getRepostitory()
+	public function getRepository()
 	{
 		return($this->composerConfig["repository"]);
 	}
@@ -135,7 +145,7 @@ class Config
 	 * @param string $repository
 	 * @return \FSmoak\AssetManagerPlugin\Config
 	 */
-	public function setRepostitory(string $repository)
+	public function setRepository($repository)
 	{
 		$this->composerConfig["repository"] = $repository;
 		return($this);
@@ -163,7 +173,7 @@ class Config
 	 * @param string $path
 	 * @return \FSmoak\AssetManagerPlugin\Config
 	 */
-	public function addPath(string $path)
+	public function addPath($path)
 	{
 		$this->composerConfig["paths"][] = $path;
 		return($this);
@@ -181,7 +191,7 @@ class Config
 	 * @param string $method
 	 * @return \FSmoak\AssetManagerPlugin\Config
 	 */
-	public function setMethod(string $method)
+	public function setMethod($method)
 	{
 		$this->composerConfig["method"] = $method;
 		return($this);
@@ -199,7 +209,7 @@ class Config
 	 * @param bool $mysql_enabled
 	 * @return \FSmoak\AssetManagerPlugin\Config
 	 */
-	public function setMysqlEnabled(bool $mysql_enabled)
+	public function setMysqlEnabled($mysql_enabled)
 	{
 		$this->composerConfig["mysql_enabled"] = $mysql_enabled;
 		return($this);
@@ -217,7 +227,7 @@ class Config
 	 * @param string $mysql_file
 	 * @return \FSmoak\AssetManagerPlugin\Config
 	 */
-	public function setMysqlFile(string $mysql_file)
+	public function setMysqlFile($mysql_file)
 	{
 		$this->composerConfig["mysql_file"] = $mysql_file;
 		return($this);
@@ -235,7 +245,7 @@ class Config
 	 * @param string $mysql_dump_command
 	 * @return \FSmoak\AssetManagerPlugin\Config
 	 */
-	public function setMysqlDumpCommand(string $mysql_dump_command)
+	public function setMysqlDumpCommand($mysql_dump_command)
 	{
 		$this->composerConfig["mysql_dump_command"] = $mysql_dump_command;
 		return($this);
@@ -253,20 +263,20 @@ class Config
 	 * @param string $mysql_import_command
 	 * @return \FSmoak\AssetManagerPlugin\Config
 	 */
-	public function setMysqlImportCommand(string $mysql_import_command)
+	public function setMysqlImportCommand($mysql_import_command)
 	{
 		$this->composerConfig["mysql_import_command"] = $mysql_import_command;
 		return($this);
 	}
 	
-	public function getEnviroment()
+	public function getEnvironment()
 	{
 		return($this->assetManagerConfig["environment"]);
 	}
 	
-	public function setEnviroment($enviroment)
+	public function setEnvironment($environment)
 	{
-		$this->assetManagerConfig["environment"] = $enviroment;
+		$this->assetManagerConfig["environment"] = $environment;
 		return($this);
 	}
 }

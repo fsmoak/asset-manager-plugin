@@ -1,13 +1,22 @@
 <?php
+/**
+ *
+ *  * This file is part of Asset-Manager Composer-Plugin
+ *  *
+ *  * (c) FSmoak <marieschreiber84@gmail.com>
+ *  *
+ *  * For the full copyright and license information, please view the LICENSE
+ *  * file that was distributed with this source code.
+ *  
+ */
+
 namespace FSmoak\AssetManagerPlugin;
 
 use function array_filter;
 use Composer\Composer;
 use Composer\IO\IOInterface;
-use function copy;
 use function file_exists;
 use function mkdir;
-use function move_uploaded_file;
 use function substr;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -33,11 +42,6 @@ class AssetManager
 	private $config;
 
 	/**
-	 * @var string
-	 */
-	private $composerJson;
-
-	/**
 	 * @var bool
 	 */
 	private $refreshRepositoryOnce = false;
@@ -57,34 +61,34 @@ class AssetManager
 	/**
 	 * @return \Composer\Composer
 	 */
-	public function getComposer(): \Composer\Composer
+	public function getComposer()
 	{
-		return $this->composer;
+		return($this->composer);
 	}
 
 	/**
-	 * @param \Composer\Composer $composer
+	 * @param Composer $composer
 	 * @return \FSmoak\AssetManagerPlugin\AssetManager
 	 */
-	public function setComposer(\Composer\Composer $composer)
+	public function setComposer(Composer $composer)
 	{
 		$this->composer = $composer;
 		return($this);
 	}
 
 	/**
-	 * @return \Composer\IO\ConsoleIO
+	 * @return \Composer\IO\ConsoleIO|\Composer\IO\IOInterface
 	 */
-	public function getIo(): \Composer\IO\ConsoleIO
+	public function getIo()
 	{
 		return $this->io;
 	}
 
 	/**
-	 * @param \Composer\IO\IOInterface $io
+	 * @param IOInterface $io
 	 * @return \FSmoak\AssetManagerPlugin\AssetManager
 	 */
-	public function setIo(\Composer\IO\IOInterface $io)
+	public function setIo(IOInterface $io)
 	{
 		$this->io = $io;
 		return($this);
@@ -93,7 +97,7 @@ class AssetManager
 	/**
 	 * @return Config
 	 */
-	public function getConfig(): Config
+	public function getConfig()
 	{
 		return $this->config;
 	}
@@ -148,9 +152,16 @@ class AssetManager
 		});
 		$finder = new Finder();
 		$finder->files()->in($includePaths)->exclude($excludePaths);
-		return(array_map(function(SplFileInfo $file) {
-			return($file->getFileInfo(Asset::class));
-		},iterator_to_array($finder)));
+		try
+		{
+			return(array_map(function(SplFileInfo $file) {
+				return($file->getFileInfo(Asset::class));
+			},iterator_to_array($finder)));
+		}
+		catch (Exception $e)
+		{
+			return([]);
+		}
 	}
 
 	/**
@@ -161,7 +172,14 @@ class AssetManager
 		$this->refreshRepository();
 		$finder = new Finder();
 		$finder->files()->in(AssetManager::CLONE_DIR);
-		return(array_map(function(SplFileInfo $file){return($file->getFileInfo(Asset::class));},iterator_to_array($finder)));
+		try
+		{
+			return(array_map(function(SplFileInfo $file){return($file->getFileInfo(Asset::class));},iterator_to_array($finder)));
+		}
+		catch (Exception $e)
+		{
+			return([]);
+		}
 	}
 
 	/**
@@ -201,6 +219,7 @@ class AssetManager
 	}
 
 	/**
+	 * @param bool $includeSymlinks
 	 * @return Asset[]
 	 */
 	public function getUnchangedAssets($includeSymlinks = true)
@@ -283,7 +302,7 @@ class AssetManager
 		{
 			return(true);
 		}
-		if ($repository = $this->getConfig()->getRepostitory())
+		if ($repository = $this->getConfig()->getRepository())
 		{
 			$cloneDir = self::getCloneDir();
 			exec("git ls-remote -h " . $cloneDir->path, $output, $exitcode);

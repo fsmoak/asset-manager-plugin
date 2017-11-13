@@ -1,4 +1,15 @@
 <?php
+/**
+ *
+ *  * This file is part of Asset-Manager Composer-Plugin
+ *  *
+ *  * (c) FSmoak <marieschreiber84@gmail.com>
+ *  *
+ *  * For the full copyright and license information, please view the LICENSE
+ *  * file that was distributed with this source code.
+ *  
+ */
+
 namespace FSmoak\AssetManagerPlugin;
 
 use Composer\Composer;
@@ -16,7 +27,7 @@ class AssetManagerPlugin implements PluginInterface, Capable
 	/**
 	 * @return \FSmoak\AssetManagerPlugin\AssetManager
 	 */
-	public function getAssetManager(): \FSmoak\AssetManagerPlugin\AssetManager
+	public function getAssetManager()
 	{
 		return $this->assetManager;
 	}
@@ -24,7 +35,7 @@ class AssetManagerPlugin implements PluginInterface, Capable
 	/**
 	 * @param \FSmoak\AssetManagerPlugin\AssetManager $assetManager
 	 */
-	public function setAssetManager(\FSmoak\AssetManagerPlugin\AssetManager $assetManager)
+	public function setAssetManager($assetManager)
 	{
 		$this->assetManager = $assetManager;
 	}

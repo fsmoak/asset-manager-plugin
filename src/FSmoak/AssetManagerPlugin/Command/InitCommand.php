@@ -1,13 +1,24 @@
 <?php
+/**
+ *
+ *  * This file is part of Asset-Manager Composer-Plugin
+ *  *
+ *  * (c) FSmoak <marieschreiber84@gmail.com>
+ *  *
+ *  * For the full copyright and license information, please view the LICENSE
+ *  * file that was distributed with this source code.
+ *  
+ */
 
 namespace FSmoak\AssetManagerPlugin\Command;
 
+use Exception;
 use FSmoak\AssetManagerPlugin\AssetManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class InitCommand extends AbstactCommand
+class InitCommand extends AbstractCommand
 {
 	protected function configure()
 	{
@@ -20,21 +31,29 @@ class InitCommand extends AbstactCommand
 		$io = $this->getIO();
 		$config = $this->getAssetManager()->getConfig();
 
-		if (!$config->getRepostitory())
+		if (!$config->getRepository())
 		{
 			$io->write("<info>Asset Repository not set! Please provide valid path to a GIT LFS Repository.</info>");
 		}
-		$config->setRepostitory($io->askAndValidate("Asset Repository [" . $config->getRepostitory() . "]: ", function($repo) use ($io) {
-			$cmd = "git ls-remote -h " . $repo;
-			$io->write("<comment>Checking repository: $ " . $cmd . "</comment>");
-			exec("git ls-remote -h " . $repo, $output, $exitcode);
-			if ($exitcode == 0)
-			{
-				return ($repo);
-			}
-			throw new \Exception($repo . " is not a git repository!");
-		}, NULL, $config->getRepostitory()));
-		$io->write("<info>Using " . $config->getRepostitory() . " as repository from now on.</info>");
+		try
+		{
+			$config->setRepository($io->askAndValidate("Asset Repository [" . $config->getRepository() . "]: ", function($repo) use ($io) {
+				$cmd = "git ls-remote -h " . $repo;
+				$io->write("<comment>Checking repository: $ " . $cmd . "</comment>");
+				exec("git ls-remote -h " . $repo, $output, $exitcode);
+				if ($exitcode == 0)
+				{
+					return ($repo);
+				}
+				throw new \Exception($repo . " is not a git repository!");
+			}, NULL, $config->getRepository()));
+		}
+		catch (Exception $e)
+		{
+			$io->writeError("<error>".$e->getMessage()."</error>");
+			exit;
+		}
+		$io->write("<info>Using " . $config->getRepository() . " as repository from now on.</info>");
 
 		if (empty($config->getPaths()))
 		{
@@ -65,13 +84,21 @@ class InitCommand extends AbstactCommand
 
 		if (!$config->getEnviroment())
 		{
-			$io->write("<info>Asset Enviroment not set! Please select a Branch name from the Repository.</info>");
+			$io->write("<info>Asset Environment not set! Please select a Branch name from the Repository.</info>");
 		}
-		$config->setEnviroment($io->askAndValidate("Asset Enviroment [" . $config->getEnviroment() . "]: ", function($env) use ($io) {
-			if (!empty($env)) return($env);
-			throw new \Exception($env . " is not a branchname!");
-		}, NULL, $config->getEnviroment()));
-		$io->write("<info>Using " . $config->getEnviroment() . " as enviroment from now on.</info>");
+		try
+		{
+			$config->setEnviroment($io->askAndValidate("Asset Environment [" . $config->getEnviroment() . "]: ", function($env) use ($io) {
+				if (!empty($env)) return($env);
+				throw new \Exception($env . " is not a branch name!");
+			}, NULL, $config->getEnviroment()));
+		}
+		catch (Exception $e)
+		{
+			$io->writeError("<error>".$e->getMessage()."</error>");
+			exit;
+		}
+		$io->write("<info>Using " . $config->getEnviroment() . " as environment from now on.</info>");
 		
 		if (file_exists(".gitignore") && !in_array("asset-manager.json",explode("\n",file_get_contents(".gitignore"))))
 		{
