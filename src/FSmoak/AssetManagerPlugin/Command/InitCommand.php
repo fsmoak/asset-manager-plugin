@@ -3,7 +3,6 @@
 namespace FSmoak\AssetManagerPlugin\Command;
 
 use FSmoak\AssetManagerPlugin\AssetManager;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -49,7 +48,7 @@ class InitCommand extends AbstactCommand
 				$io->write("<comment>Paths: \n * " . implode("\n * ", $config->getPaths()) . "</comment>");
 			}
 			$addPath = $io->ask("Add Path: ");
-			if ($addPath)
+			if ($addPath && substr($addPath,0,1) != "/")
 			{
 				$config->addPath($addPath);
 			}
@@ -59,7 +58,7 @@ class InitCommand extends AbstactCommand
 			$this->getHelper("question")->ask(
 				$input,
 				$output,
-				new ChoiceQuestion("Select a Method (default: ".AssetManager::METHOD_SYMLINK.")", [
+				new ChoiceQuestion("Select a Method (default: ".$config->getMethod().")", [
 					AssetManager::METHOD_SYMLINK,
 					AssetManager::METHOD_COPY
 				], $config->getMethod())));
@@ -76,9 +75,9 @@ class InitCommand extends AbstactCommand
 		
 		if (file_exists(".gitignore") && !in_array("asset-manager.json",explode("\n",file_get_contents(".gitignore"))))
 		{
-			if ($io->askConfirmation("Add asset-manager.json to .gitignore? [Y/n]",true))
+			if ($io->askConfirmation("Add asset-manager.json & .asset-manager/ to .gitignore? [Y/n]",true))
 			{
-				file_put_contents(".gitignore","\nasset-manager.json",FILE_APPEND);
+				file_put_contents(".gitignore","\nasset-manager.json\n.asset-manager/",FILE_APPEND);
 			}
 		}
 		

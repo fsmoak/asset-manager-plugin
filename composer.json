@@ -10,7 +10,8 @@
 		"class": "FSmoak\\AssetManagerPlugin\\AssetManagerPlugin"
 	},
 	"require": {
-		"composer-plugin-api": "^1.0"
+		"composer-plugin-api": "^1.0",
+		"webmozart/path-util": "^2.3.0"
 	},
 	"require-dev": {
 		"composer/composer": "^1.3"
