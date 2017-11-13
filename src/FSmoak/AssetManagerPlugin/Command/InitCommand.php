@@ -14,6 +14,8 @@ namespace FSmoak\AssetManagerPlugin\Command;
 
 use Exception;
 use FSmoak\AssetManagerPlugin\AssetManager;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
@@ -68,17 +70,41 @@ class InitCommand extends AbstractCommand
 		{
 			$io->write("<error>No paths configured! Where are your assets?</error>");
 		}
-		$addPath = TRUE;
-		while (empty($config->getPaths()) || $addPath)
+		while (true)
 		{
-			if (!empty($config->getPaths()))
+			$paths = $config->getPaths();
+			$table = new Table($output);
+			$table
+				->setHeaders([
+					[new TableCell('<comment>Paths:</comment>', ['colspan' => 2])],
+					['#', 'Path'],
+				])
+				->setRows(
+					(!empty($paths) ?
+						array_map(function($index,$value)
+						{
+							return([($index+1),$value]);
+						},array_keys($paths),$paths)
+						:
+						[[new TableCell('<info>---</info>', ['colspan' => 2])]]
+					)
+				)
+				->render();
+			$answer = $io->ask("<warning>Add/Remove Path:</warning> ");
+			if ($answer !== null)
 			{
-				$io->write("<comment>Paths:</comment> \n * " . implode("\n * ", $config->getPaths()));
+				if (is_numeric($answer))
+				{
+					$config->delPath(intval($answer)-1);
+				}
+				else
+				{
+					$config->addPath($answer);
+				}
 			}
-			$addPath = $io->ask("<warning>Add Path:</warning> ");
-			if ($addPath && substr($addPath,0,1) != "/")
+			else
 			{
-				$config->addPath($addPath);
+				break;
 			}
 		}
 
@@ -91,6 +117,120 @@ class InitCommand extends AbstractCommand
 					AssetManager::METHOD_COPY
 				], $config->getMethod())));
 		$io->write("<info>Using</info> " . $config->getMethod() . " <info>as method from now on.</info>");
+		
+		while (true)
+		{
+			$beforeCommits = $config->getBeforeCommit();
+			$table = new Table($output);
+			$table
+				->setHeaders([
+					[new TableCell('<comment>BeforeCommit:</comment>', ['colspan' => 2])],
+					['#', 'Command'],
+				])
+				->setRows(
+					(!empty($beforeCommits) ?
+						array_map(function($index,$value)
+						{
+							return([($index+1),$value]);
+						},array_keys($beforeCommits),$beforeCommits)
+						:
+						[[new TableCell('<info>---</info>', ['colspan' => 2])]]
+					)
+				)
+				->render();
+			$answer = $io->ask("<warning>Add/Remove BeforeCommit:</warning> ");
+			if ($answer !== null)
+			{
+				if (is_numeric($answer))
+				{
+					$config->delBeforeCommit(intval($answer)-1);	
+				}
+				else
+				{
+					$config->addBeforeCommit($answer);
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		while (true)
+		{
+			$afterDeploys = $config->getAfterDeploy();
+			$table = new Table($output);
+			$table
+				->setHeaders([
+					[new TableCell('<comment>AfterDeploy:</comment>', ['colspan' => 2])],
+					['#', 'Command'],
+				])
+				->setRows(
+					(!empty($afterDeploys) ?
+						array_map(function($index,$value)
+						{
+							return([($index+1),$value]);
+						},array_keys($afterDeploys),$afterDeploys)
+						:
+						[[new TableCell('<info>---</info>', ['colspan' => 2])]]
+					)
+				)
+				->render();
+			$answer = $io->ask("<warning>Add/Remove AfterDeploy:</warning> ");
+			if ($answer !== null)
+			{
+				if (is_numeric($answer))
+				{
+					$config->delAfterDeploy(intval($answer)-1);
+				}
+				else
+				{
+					$config->addAfterDeploy($answer);
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		while (true)
+		{
+			$variables = $config->getVariables();
+			$table = new Table($output);
+			$table
+				->setHeaders([
+					[new TableCell('<comment>Variables:</comment>', ['colspan' => 2])],
+					['Key', 'Default Value'],
+				])
+				->setRows(
+					(!empty($variables) ?
+						array_map(function($key,$value)
+						{
+							return([$key,$value]);
+						},array_keys($variables),$variables)
+						:
+						[[new TableCell('<info>---</info>', ['colspan' => 2])]]
+					)
+				)
+				->render();
+			$answer = $io->ask("<warning>Add/Remove Variable:</warning> ");
+			if ($answer !== null)
+			{
+				if (array_key_exists($answer,$variables))
+				{
+					$config->delVariable($answer);
+				}
+				else
+				{
+					$config->addVariable($answer,$io->ask("<warning>Default Value for ".$answer.":</warning> "));
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
 		
 		if (!$config->getEnvironment())
 		{
@@ -109,6 +249,48 @@ class InitCommand extends AbstractCommand
 			exit;
 		}
 		$io->write("<info>Using</info> " . $config->getEnvironment() . " <info>as environment from now on.</info>");
+		
+		if ($config->getVariables())
+		{
+			while (TRUE)
+			{
+				$variables = $config->getVariables();
+				$table = new Table($output);
+				$table
+					->setHeaders([
+						[new TableCell('<comment>Environment Values:</comment>', ['colspan' => 3])],
+						[
+							'Key',
+							'Default Value',
+							"Environment Value (" . $config->getEnvironment() . ")"
+						],
+					])
+					->setRows(
+						array_map(function($key, $value) use ($config)
+						{
+							return ([
+								$key,
+								$value,
+								$config->getEnvironmentVariable($key),
+							]);
+						},array_keys($variables),$variables)
+					)
+					->render();
+				
+				$answer = $io->ask("<warning>Set Environment Variable:</warning> ");
+				if ($answer !== NULL)
+				{
+					if (array_key_exists($answer, $variables))
+					{
+						$config->setEnvironmentVariable($answer,$io->ask("<warning>Environment Value for ".$answer.":</warning> "));
+					}
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
 		
 		if (file_exists(".gitignore") && !in_array("asset-manager.json",explode("\n",file_get_contents(".gitignore"))))
 		{

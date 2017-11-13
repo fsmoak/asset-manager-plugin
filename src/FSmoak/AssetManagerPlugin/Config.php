@@ -39,10 +39,9 @@ class Config
 		"repository" => null,
 		"paths" => [],
 		"method" => AssetManager::METHOD_SYMLINK,
-		"mysql_enabled" => false,
-		"mysql_file" => ".asset-manager.sql",
-		"mysql_dump_command" => "mysqldump -h {host} -u {user} -p{pass} {db} > {file}",
-		"mysql_import_command" => "mysql -h {host} -u {user} -p{pass} {db} < {file}",
+		"before-commit" => [],
+		"after-deploy" => [],
+		"variables" => [],
 	];
 	
 	/**
@@ -55,12 +54,6 @@ class Config
 	 */
 	private $assetManagerDefault = [
 		"environment" => null,
-		"mysql_enable" => null,
-		"mysql_host" => null,
-		"mysql_port" => 3306,
-		"mysql_user" => null,
-		"mysql_pass" => null,
-		"mysql_db" => null,
 	];
 
 	/**
@@ -180,6 +173,18 @@ class Config
 	}
 
 	/**
+	 * @param int $index
+	 */
+	public function delPath($index)
+	{
+		if (array_key_exists($index,$this->composerConfig["paths"]))
+		{
+			array_splice($this->composerConfig["paths"],$index,1);
+		}
+		return($this);
+	}
+
+	/**
 	 * @return string
 	 */
 	public function getMethod()
@@ -198,78 +203,6 @@ class Config
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function getMysqlEnabled()
-	{
-		return($this->composerConfig["mysql_enabled"]);
-	}
-
-	/**
-	 * @param bool $mysql_enabled
-	 * @return \FSmoak\AssetManagerPlugin\Config
-	 */
-	public function setMysqlEnabled($mysql_enabled)
-	{
-		$this->composerConfig["mysql_enabled"] = $mysql_enabled;
-		return($this);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMysqlFile()
-	{
-		return($this->composerConfig["mysql_file"]);
-	}
-
-	/**
-	 * @param string $mysql_file
-	 * @return \FSmoak\AssetManagerPlugin\Config
-	 */
-	public function setMysqlFile($mysql_file)
-	{
-		$this->composerConfig["mysql_file"] = $mysql_file;
-		return($this);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMysqlDumpCommand()
-	{
-		return($this->composerConfig["mysql_dump_command"]);
-	}
-
-	/**
-	 * @param string $mysql_dump_command
-	 * @return \FSmoak\AssetManagerPlugin\Config
-	 */
-	public function setMysqlDumpCommand($mysql_dump_command)
-	{
-		$this->composerConfig["mysql_dump_command"] = $mysql_dump_command;
-		return($this);
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getMysqlImportCommand()
-	{
-		return($this->composerConfig["mysql_import_command"]);
-	}
-
-	/**
-	 * @param string $mysql_import_command
-	 * @return \FSmoak\AssetManagerPlugin\Config
-	 */
-	public function setMysqlImportCommand($mysql_import_command)
-	{
-		$this->composerConfig["mysql_import_command"] = $mysql_import_command;
-		return($this);
-	}
-
-	/**
 	 * @return mixed
 	 */
 	public function getEnvironment()
@@ -284,6 +217,151 @@ class Config
 	public function setEnvironment($environment)
 	{
 		$this->assetManagerConfig["environment"] = $environment;
+		return($this);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getBeforeCommit()
+	{
+		return($this->composerConfig["before-commit"]);
+	}
+
+	/**
+	 * @param array $beforeCommit
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
+	public function setBeforeCommit($beforeCommit)
+	{
+		$this->composerConfig["before-commit"] = $beforeCommit;
+		return($this);
+	}
+
+	/**
+	 * @param string $beforeCommit
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
+	public function addBeforeCommit($beforeCommit)
+	{
+		$this->composerConfig["before-commit"][] = $beforeCommit;
+		return($this);
+	}
+
+	/**
+	 * @param int $index
+	 */
+	public function delBeforeCommit($index)
+	{
+		if (array_key_exists($index,$this->composerConfig["before-commit"]))
+		{
+			array_splice($this->composerConfig["before-commit"],$index,1);
+		}
+		return($this);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getAfterDeploy()
+	{
+		return($this->composerConfig["after-deploy"]);
+	}
+
+	/**
+	 * @param array $afterDeploy
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
+	public function setAfterDeploy($afterDeploy)
+	{
+		$this->composerConfig["after-deploy"] = $afterDeploy;
+		return($this);
+	}
+
+	/**
+	 * @param string $afterDeploy
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
+	public function addAfterDeploy($afterDeploy)
+	{
+		$this->composerConfig["after-deploy"][] = $afterDeploy;
+		return($this);
+	}
+
+	/**
+	 * @param int $index
+	 */
+	public function delAfterDeploy($index)
+	{
+		if (array_key_exists($index,$this->composerConfig["after-deploy"]))
+		{
+			array_splice($this->composerConfig["after-deploy"],$index,1);
+		}
+		return($this);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getVariables()
+	{
+		return($this->composerConfig["variables"]);
+	}
+
+	/**
+	 * @param array $variables
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
+	public function setVariables($variables)
+	{
+		$this->composerConfig["variables"] = $variables;
+		return($this);
+	}
+
+	/**
+	 * @param string $name
+	 * @param mixed $value
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
+	public function addVariable($name,$value)
+	{
+		$this->composerConfig["variables"][$name] = $value;
+		return($this);
+	}
+
+	/**
+	 * @param int $name
+	 */
+	public function delVariable($name)
+	{
+		if (array_key_exists($name,$this->composerConfig["variables"]))
+		{
+			unset($this->composerConfig["variables"][$name]);
+		}
+		return($this);
+	}
+
+	/**
+	 * @param $name
+	 * @return array|mixed|null
+	 */
+	public function getEnvironmentVariable($name)
+	{
+		if (array_key_exists($name,$this->assetManagerConfig))
+		{
+			return($this->assetManagerConfig[$name]);
+		}
+		return(null);
+	}
+
+	/**
+	 * @param $name
+	 * @param null $value
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
+	public function setEnvironmentVariable($name, $value = null)
+	{
+		$this->assetManagerConfig[$name] = $value;
 		return($this);
 	}
 }
