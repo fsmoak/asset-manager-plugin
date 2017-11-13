@@ -19,8 +19,15 @@ use FSmoak\AssetManagerPlugin\Command\SymlinkCommand;
 use FSmoak\AssetManagerPlugin\Command\CopyCommand;
 use FSmoak\AssetManagerPlugin\Command\DeployCommand;
 
+/**
+ * Class CommandProvider
+ * @package FSmoak\AssetManagerPlugin
+ */
 class CommandProvider implements CommandProviderCapability
 {
+	/**
+	 * @return array|\Composer\Command\BaseCommand[]
+	 */
 	public function getCommands()
 	{
 		return([

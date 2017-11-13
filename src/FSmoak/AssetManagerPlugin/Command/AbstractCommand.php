@@ -15,8 +15,16 @@ use Composer\Command\BaseCommand;
 use FSmoak\AssetManagerPlugin\AssetManager;
 use FSmoak\AssetManagerPlugin\AssetManagerPlugin;
 
+/**
+ * Class AbstractCommand
+ * @package FSmoak\AssetManagerPlugin\Command
+ */
 abstract class AbstractCommand extends BaseCommand
 {
+	/**
+	 * AbstractCommand constructor.
+	 * @param null $name
+	 */
 	public function __construct($name = NULL)
 	{
 		parent::__construct($name);
@@ -26,6 +34,10 @@ abstract class AbstractCommand extends BaseCommand
 	 * @var AssetManager
 	 */
 	private $assetManager;
+
+	/**
+	 * @return \FSmoak\AssetManagerPlugin\AssetManager
+	 */
 	public function getAssetManager()
 	{
 		if ($this->assetManager) return($this->assetManager);

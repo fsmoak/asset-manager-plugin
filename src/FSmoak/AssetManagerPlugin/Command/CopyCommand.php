@@ -18,6 +18,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
+/**
+ * Class CopyCommand
+ * @package FSmoak\AssetManagerPlugin\Command
+ */
 class CopyCommand extends AbstractCommand
 {
 	protected function configure()
@@ -27,6 +31,11 @@ class CopyCommand extends AbstractCommand
 			->addOption("force","f",InputOption::VALUE_NONE,"Force override");
 	}
 
+	/**
+	 * @param \Symfony\Component\Console\Input\InputInterface $input
+	 * @param \Symfony\Component\Console\Output\OutputInterface $output
+	 * @return int|null|void
+	 */
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$io = $this->getIO();

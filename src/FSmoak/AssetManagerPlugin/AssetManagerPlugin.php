@@ -17,6 +17,10 @@ use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
 use Composer\Plugin\Capable;
 
+/**
+ * Class AssetManagerPlugin
+ * @package FSmoak\AssetManagerPlugin
+ */
 class AssetManagerPlugin implements PluginInterface, Capable
 {
 	/**
@@ -39,7 +43,11 @@ class AssetManagerPlugin implements PluginInterface, Capable
 	{
 		$this->assetManager = $assetManager;
 	}
-	
+
+	/**
+	 * @param \Composer\Composer $composer
+	 * @param \Composer\IO\IOInterface $io
+	 */
 	public function activate(Composer $composer, IOInterface $io)
 	{
 		$io->write("Initializing Asset-Manager Plugin...",true,$io::VERY_VERBOSE);
@@ -49,6 +57,9 @@ class AssetManagerPlugin implements PluginInterface, Capable
 		$this->getAssetManager()->activate();
 	}
 
+	/**
+	 * @return array|string[]
+	 */
 	public function getCapabilities()
 	{
 		return array(

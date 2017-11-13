@@ -22,6 +22,10 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use FSmoak\AssetManagerPlugin\Asset AS Asset;
 
+/**
+ * Class AssetManager
+ * @package FSmoak\AssetManagerPlugin
+ */
 class AssetManager
 {
 	const METHOD_SYMLINK = "symlink";
@@ -241,6 +245,10 @@ class AssetManager
 		return($unchanged);
 	}
 
+	/**
+	 * @param null $assets
+	 * @return \FSmoak\AssetManagerPlugin\AssetManager
+	 */
 	public function deleteAssetsFromRepository($assets = null)
 	{
 		if (!$assets)
@@ -254,7 +262,11 @@ class AssetManager
 		$this->commitRepository();
 		return($this);
 	}
-	
+
+	/**
+	 * @param $assets
+	 * @return \FSmoak\AssetManagerPlugin\AssetManager
+	 */
 	public function updateAssetsToRepository($assets)
 	{
 		if (!$assets)
@@ -295,7 +307,10 @@ class AssetManager
 	{
 		exec("git -C ".self::getCloneDir()->path." push origin ".$this->getConfig()->getEnvironment());
 	}
-	
+
+	/**
+	 * @return bool
+	 */
 	public function refreshRepository()
 	{
 		if ($this->refreshRepositoryOnce)

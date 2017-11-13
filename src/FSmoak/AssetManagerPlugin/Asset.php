@@ -22,6 +22,10 @@ use Symfony\Component\Finder\SplFileInfo;
 use function unlink;
 use Webmozart\PathUtil\Path;
 
+/**
+ * Class Asset
+ * @package FSmoak\AssetManagerPlugin
+ */
 class Asset extends SplFileInfo
 {
 	/**
@@ -42,6 +46,10 @@ class Asset extends SplFileInfo
 		}
 		parent::__construct($file, dirname($file), $file);
 	}
+
+	/**
+	 * @return bool
+	 */
 	public function hasChanged()
 	{
 		if (!$this->existsInDeployed() || !$this->existsInRepository())
@@ -54,36 +62,69 @@ class Asset extends SplFileInfo
 		}
 		return(true);
 	}
+
+	/**
+	 * @return string
+	 */
 	public function getRepositoryPathname()
 	{
 		return(AssetManager::getCloneDir()->path.$this->getDeployedPathname());
 	}
+
+	/**
+	 * @return string
+	 */
 	public function getRepositoryPath()
 	{
 		return(dirname($this->getRepositoryPathname()));
 	}
+
+	/**
+	 * @return null|string|string[]
+	 */
 	public function getDeployedPathname()
 	{
 		return(preg_replace("/^".preg_quote(AssetManager::CLONE_DIR,"/")."/","",$this->getRelativePathname()));
 	}
+
+	/**
+	 * @return string
+	 */
 	public function getDeployedPath()
 	{
 		return(dirname($this->getDeployedPathname()));
 	}
+
+	/**
+	 * @return bool
+	 */
 	public function existsInRepository()
 	{
 		return(file_exists($this->getRepositoryPathname()));
 	}
+
+	/**
+	 * @return bool
+	 */
 	public function existsInDeployed()
 	{
 		return(file_exists($this->getDeployedPathname()));
 	}
+
+	/**
+	 * @return bool
+	 */
 	public function isLink()
 	{
 		return(is_link($this->getDeployedPathname()));
 	}
 
-	public function symlink($move = false,$force = false)
+	/**
+	 * @param bool $move
+	 * @param bool $force
+	 * @return bool
+	 */
+	public function symlink($move = false, $force = false)
 	{
 		if ($move)
 		{
@@ -107,10 +148,18 @@ class Asset extends SplFileInfo
 	{
 		rename($this->getDeployedPathname(),$this->getRepositoryPathname());
 	}
+
+	/**
+	 * @return bool
+	 */
 	public function copyToRepository()
 	{
 		return(copy($this->getDeployedPathname(),$this->getRepositoryPathname()));
 	}
+
+	/**
+	 * @return bool
+	 */
 	public function copyToDeployed()
 	{
 		if ($this->existsInDeployed() && $this->isLink())
@@ -119,11 +168,18 @@ class Asset extends SplFileInfo
 		}
 		return(copy($this->getRepositoryPathname(),$this->getDeployedPathname()));
 	}
-	
+
+	/**
+	 * @return string
+	 */
 	public function getRelativePathFromDeployedToRepository()
 	{
 		return(Path::makeRelative($this->getRepositoryPathname(),dirname($this->getDeployedPathname())));
 	}
+
+	/**
+	 * @return string
+	 */
 	public function getRelativePathFromRepositoryToDeployed()
 	{
 		return(Path::makeRelative($this->getDeployedPathname(),dirname($this->getRepositoryPathname())));
