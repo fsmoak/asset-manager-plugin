@@ -293,7 +293,7 @@ class AssetManager
 
 	public function pushRepository()
 	{
-		exec("git -C ".self::getCloneDir()->path." push origin ".$this->getConfig()->getEnviroment());
+		exec("git -C ".self::getCloneDir()->path." push origin ".$this->getConfig()->getEnvironment());
 	}
 	
 	public function refreshRepository()
@@ -311,13 +311,13 @@ class AssetManager
 				$this->getIo()->write("<error>Local working copy does not exist!</error> <info>Cloning from ".$repository." to ".$cloneDir->path.".</info>");
 				exec("git clone ".$repository." ".$cloneDir->path);
 			}
-			exec("git -C ".$cloneDir->path." pull origin ".$this->getConfig()->getEnviroment(),$output,$exitcode);
+			exec("git -C ".$cloneDir->path." pull origin ".$this->getConfig()->getEnvironment(),$output,$exitcode);
 			if ($exitcode != 0)
 			{
-				$this->getIo()->write("<error>Environment branch does not exist!</error> <info>Creating new Branch ".$this->getConfig()->getEnviroment().".</info>");
-				exec("git -C ".$cloneDir->path." branch ".$this->getConfig()->getEnviroment());
+				$this->getIo()->write("<error>Environment branch does not exist!</error> <info>Creating new Branch ".$this->getConfig()->getEnvironment().".</info>");
+				exec("git -C ".$cloneDir->path." branch ".$this->getConfig()->getEnvironment());
 			}
-			exec("git -C ".$cloneDir->path." checkout ".$this->getConfig()->getEnviroment(),$output,$exitcode);
+			exec("git -C ".$cloneDir->path." checkout ".$this->getConfig()->getEnvironment(),$output,$exitcode);
 			if ($exitcode == 0)
 			{
 				$this->refreshRepositoryOnce = true;

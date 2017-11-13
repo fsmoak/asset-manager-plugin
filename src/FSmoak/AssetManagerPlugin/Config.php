@@ -268,12 +268,19 @@ class Config
 		$this->composerConfig["mysql_import_command"] = $mysql_import_command;
 		return($this);
 	}
-	
+
+	/**
+	 * @return mixed
+	 */
 	public function getEnvironment()
 	{
 		return($this->assetManagerConfig["environment"]);
 	}
-	
+
+	/**
+	 * @param $environment
+	 * @return \FSmoak\AssetManagerPlugin\Config
+	 */
 	public function setEnvironment($environment)
 	{
 		$this->assetManagerConfig["environment"] = $environment;

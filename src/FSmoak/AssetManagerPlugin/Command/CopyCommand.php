@@ -18,12 +18,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 
-class SymlinkCommand extends AbstractCommand
+class CopyCommand extends AbstractCommand
 {
 	protected function configure()
 	{
-		$this->setName('asset-manager-symlink')
-			->setDescription("Symlink unchanged assets")
+		$this->setName('asset-manager-copy')
+			->setDescription("Copy unchanged assets")
 			->addOption("force","f",InputOption::VALUE_NONE,"Force override");
 	}
 
@@ -40,23 +40,23 @@ class SymlinkCommand extends AbstractCommand
 		}
 		$io->write("<info>Asset-Manager Environment:</info> ".$config->getEnvironment());
 		
-		$unchangedAssets = $this->getAssetManager()->getUnchangedAssets(false);
+		$unchangedAssets = $this->getAssetManager()->getUnchangedAssets(true);
 		if (!empty($unchangedAssets))
 		{
-			$io->write("<info>The following assets will replaced with symlinks:</info>");
+			$io->write("<info>The following assets will replaced with copies from the repository:</info>");
 			foreach ($unchangedAssets AS $asset)
 			{
-				$io->write(" * " . $asset->getRelativePathname()." => ".$asset->getRelativePathFromDeployedToRepository());
+				$io->write(" * " . $asset->getRepositoryPathname()." => ".$asset->getDeployedPathname());
 			}
 			if (
 				$input->getOption("force") ||
-				$io->askConfirmation("<warning>Do you want to replace there assets with symlinks?</warning> [Y/n]",true)
+				$io->askConfirmation("<warning>Do you want to replace there assets with copies from the repository?</warning> [Y/n]",true)
 			)
 			{
 				foreach ($unchangedAssets AS $asset)
 				{
 					$io->write("<info>".$asset->getRelativePathname()."</info> => <comment>".$asset->getRelativePathFromDeployedToRepository()."</comment>");
-					$asset->symlink(false,true);
+					$asset->copyToDeployed();
 				}
 			}
 		}

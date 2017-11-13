@@ -31,12 +31,12 @@ class CommitCommand extends AbstractCommand
 		$io = $this->getIO();
 		$config = $this->getAssetManager()->getConfig();
 		
-		if (empty($config->getEnviroment()))
+		if (empty($config->getEnvironment()))
 		{
 			$io->write("<error>Environment not configured. Please run 'asset-manager-init' first.</error>");
 			exit;
 		}
-		$io->write("<info>Asset-Manager Environment:</info> ".$config->getEnviroment());
+		$io->write("<info>Asset-Manager Environment:</info> ".$config->getEnvironment());
 		
 		$deletedAssets = $this->getAssetManager()->getDeletedAssets();
 		if (!empty($deletedAssets))
@@ -48,7 +48,7 @@ class CommitCommand extends AbstractCommand
 			}
 			if (
 				$input->getOption("force") ||
-				$io->askConfirmation("Do you want to remove them from the repository? [Y/n]",true)
+				$io->askConfirmation("<warning>Do you want to remove them from the repository?</warning> [Y/n]",true)
 			)
 			{
 				$this->getAssetManager()->deleteAssetsFromRepository($deletedAssets);
@@ -65,7 +65,7 @@ class CommitCommand extends AbstractCommand
 			}
 			if (
 				$input->getOption("force") ||
-				$io->askConfirmation("Do you want to update them to the repository (Method: ".$config->getMethod().")? [Y/n]",true)
+				$io->askConfirmation("<warning>Do you want to update them to the repository</warning> <info>(Method: ".$config->getMethod().")?</info> [Y/n]",true)
 			)
 			{
 				$this->getAssetManager()->updateAssetsToRepository($changedAssets);
@@ -76,7 +76,7 @@ class CommitCommand extends AbstractCommand
 		{
 			if (
 				($input->getOption("force") && $input->getOption("push")) ||
-				$io->askConfirmation("Do you want to push changes to the repository? [Y/n]",true)
+				$io->askConfirmation("<warning>Do you want to push changes to the repository?</warning> [Y/n]",true)
 			)
 			{
 				$this->getAssetManager()->pushRepository();

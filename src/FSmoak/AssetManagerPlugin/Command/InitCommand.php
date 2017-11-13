@@ -37,7 +37,7 @@ class InitCommand extends AbstractCommand
 		}
 		try
 		{
-			$config->setRepository($io->askAndValidate("Asset Repository [" . $config->getRepository() . "]: ", function($repo) use ($io) {
+			$config->setRepository($io->askAndValidate("<warning>Asset Repository [" . $config->getRepository() . "]:</warning> ", function($repo) use ($io) {
 				$cmd = "git ls-remote -h " . $repo;
 				$io->write("<comment>Checking repository: $ " . $cmd . "</comment>");
 				exec("git ls-remote -h " . $repo, $output, $exitcode);
@@ -53,7 +53,7 @@ class InitCommand extends AbstractCommand
 			$io->writeError("<error>".$e->getMessage()."</error>");
 			exit;
 		}
-		$io->write("<info>Using " . $config->getRepository() . " as repository from now on.</info>");
+		$io->write("<info>Using</info> " . $config->getRepository() . " <info>as repository from now on.</info>");
 
 		if (empty($config->getPaths()))
 		{
@@ -64,9 +64,9 @@ class InitCommand extends AbstractCommand
 		{
 			if (!empty($config->getPaths()))
 			{
-				$io->write("<comment>Paths: \n * " . implode("\n * ", $config->getPaths()) . "</comment>");
+				$io->write("<comment>Paths:</comment> \n * " . implode("\n * ", $config->getPaths()));
 			}
-			$addPath = $io->ask("Add Path: ");
+			$addPath = $io->ask("<warning>Add Path:</warning> ");
 			if ($addPath && substr($addPath,0,1) != "/")
 			{
 				$config->addPath($addPath);
@@ -77,28 +77,29 @@ class InitCommand extends AbstractCommand
 			$this->getHelper("question")->ask(
 				$input,
 				$output,
-				new ChoiceQuestion("Select a Method (default: ".$config->getMethod().")", [
+				new ChoiceQuestion("<warning>Select a Method (default: ".$config->getMethod().")</warning>", [
 					AssetManager::METHOD_SYMLINK,
 					AssetManager::METHOD_COPY
 				], $config->getMethod())));
-
-		if (!$config->getEnviroment())
+		$io->write("<info>Using</info> " . $config->getMethod() . " <info>as method from now on.</info>");
+		
+		if (!$config->getEnvironment())
 		{
 			$io->write("<info>Asset Environment not set! Please select a Branch name from the Repository.</info>");
 		}
 		try
 		{
-			$config->setEnviroment($io->askAndValidate("Asset Environment [" . $config->getEnviroment() . "]: ", function($env) use ($io) {
+			$config->setEnvironment($io->askAndValidate("<warning>Asset Environment [" . $config->getEnvironment() . "]:</warning> ", function($env) use ($io) {
 				if (!empty($env)) return($env);
 				throw new \Exception($env . " is not a branch name!");
-			}, NULL, $config->getEnviroment()));
+			}, NULL, $config->getEnvironment()));
 		}
 		catch (Exception $e)
 		{
 			$io->writeError("<error>".$e->getMessage()."</error>");
 			exit;
 		}
-		$io->write("<info>Using " . $config->getEnviroment() . " as environment from now on.</info>");
+		$io->write("<info>Using</info> " . $config->getEnvironment() . " <info>as environment from now on.</info>");
 		
 		if (file_exists(".gitignore") && !in_array("asset-manager.json",explode("\n",file_get_contents(".gitignore"))))
 		{

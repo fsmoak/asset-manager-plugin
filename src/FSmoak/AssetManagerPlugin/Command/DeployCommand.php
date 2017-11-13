@@ -32,6 +32,13 @@ class DeployCommand extends AbstractCommand
 		$io = $this->getIO();
 		$config = $this->getAssetManager()->getConfig();
 
+		if (empty($config->getEnvironment()))
+		{
+			$io->write("<error>Environment not configured. Please run 'asset-manager-init' first.</error>");
+			exit;
+		}
+		$io->write("<info>Asset-Manager Environment:</info> ".$config->getEnvironment());
+		
 		$repositoryAssets = $this->getAssetManager()->getRepositoryAssets();
 		if (!empty($repositoryAssets))
 		{
@@ -42,7 +49,7 @@ class DeployCommand extends AbstractCommand
 			}
 			if (
 				$input->getOption("force") ||
-				$io->askConfirmation("Do you want to deploy there assets (Method: ".$config->getMethod().")? [Y/n]",true)
+				$io->askConfirmation("<warning>Do you want to deploy there assets</warning> <info>(Method: ".$config->getMethod().")?</info> [Y/n]",true)
 			)
 			{
 				foreach ($repositoryAssets AS $asset)
