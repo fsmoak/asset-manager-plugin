@@ -43,7 +43,45 @@ Requirements
 * PHP 5.6 or above `(tested with 7.1.8-1ubuntu1)`
 * Git `(tested with git version 2.14.1)`
 
+Configuration
+-------------
 
+#### composer.json
+
+```json
+{
+	"asset-manager": {
+		"repository": "repository",
+		"paths": [
+			"assets/",		// includes files in the "assets"-SubDirectory
+			"files/",		// includes files in the "files"-SubDirectory
+			
+			"assets2/",		// non existing paths are ignored
+			
+			"/home/",		// absolute paths are ignored
+			
+			"!cache/"		// ! are used to exclude paths
+						// 	this would exclude all files in "assets/cache/" & "files/cache/
+		],
+		"method": "symlink"
+    }
+}
+```
+*To learn more about how the Path's work imagine this*  
+`$finder->files()->in($includePaths)->exclude($excludePaths);`  
+*and look here [https://symfony.com/doc/current/components/finder.html]*
+
+#### asset-manager.json
+Configuration for the local environment.
+```json
+{
+    "environment": "test2", //this is the only variable currently used by asset-manager
+    "variableA": null,
+    "variableB": 1,
+    "variableC": "C",
+}
+```
+*DO NOT COMMIT TO GIT*
 
 Authors
 -------

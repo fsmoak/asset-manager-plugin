@@ -147,13 +147,13 @@ class AssetManager
 			}
 			return(false);
 		});
-		$excludePaths = array_filter($this->getConfig()->getPaths(),function($path){
+		$excludePaths = array_filter(array_map(function($path){
 			if (substr($path,0,1) == "!" && substr($path,1,1) != "/")
 			{
 				return(substr($path,1));
 			}
 			return(false);
-		});
+		},$this->getConfig()->getPaths()));
 		$finder = new Finder();
 		$finder->files()->in($includePaths)->exclude($excludePaths);
 		try
