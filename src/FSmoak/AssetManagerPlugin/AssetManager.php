@@ -16,9 +16,10 @@ use function array_filter;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use function file_exists;
+use function get_class;
+use Symfony\Component\Finder\Finder;
 use function mkdir;
 use function substr;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use FSmoak\AssetManagerPlugin\Asset AS Asset;
 
@@ -129,6 +130,7 @@ class AssetManager
 	 */
 	public function getLiveAssets()
 	{
+		$finder = Finder::create()->files();
 		$includePaths = array_filter($this->getConfig()->getPaths(),function($path){
 			if (
 				substr($path,0,1) == "/" ||
@@ -147,15 +149,17 @@ class AssetManager
 			}
 			return(false);
 		});
-		$excludePaths = array_filter(array_map(function($path){
+		$finder->in($includePaths);
+		$excludePaths = array_filter(array_map(function($path) use ($finder) {
 			if (substr($path,0,1) == "!" && substr($path,1,1) != "/")
 			{
-				return(substr($path,1));
+				$path = substr($path,1);
+				$finder->notPath($path);
+				return($path);
 			}
 			return(false);
 		},$this->getConfig()->getPaths()));
-		$finder = new Finder();
-		$finder->files()->in($includePaths)->exclude($excludePaths);
+		
 		try
 		{
 			return(array_map(function(SplFileInfo $file) {

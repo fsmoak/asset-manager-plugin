@@ -67,9 +67,16 @@ Configuration
     }
 }
 ```
+It basically means that !(Exclude)-Paths are relative all Include-Paths.
+
 *To learn more about how the Path's work imagine this*  
-`$finder->files()->in($includePaths)->exclude($excludePaths);`  
-*and look here [https://symfony.com/doc/current/components/finder.html]*
+```php
+$finder = $finder->files();
+$finder->in($includePaths);
+foreach($excludePaths AS $path) $finder->notPath($path);
+```  
+*and look here [https://symfony.com/doc/current/components/finder.html]*  
+
 
 #### asset-manager.json
 Configuration for the local environment.
