@@ -16,9 +16,8 @@ use function array_filter;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use function file_exists;
-use function get_class;
-use Symfony\Component\Finder\Finder;
 use function mkdir;
+use Symfony\Component\Finder\Finder;
 use function substr;
 use Symfony\Component\Finder\SplFileInfo;
 use FSmoak\AssetManagerPlugin\Asset AS Asset;
@@ -281,11 +280,6 @@ class AssetManager
 		{
 			if (file_exists($asset->getDeployedPathname()))
 			{
-				if (!file_exists($asset->getRepositoryPath()))
-				{
-					mkdir($asset->getRepositoryPath(),0777,true);
-				}
-				
 				switch ($this->getConfig()->getMethod())
 				{
 					case AssetManager::METHOD_SYMLINK:

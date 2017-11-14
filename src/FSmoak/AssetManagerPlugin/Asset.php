@@ -141,12 +141,24 @@ class Asset extends SplFileInfo
 				return(false);
 			}
 		}
+		if (!file_exists($this->getDeployedPath()))
+		{
+			mkdir($this->getDeployedPath(),0777,true);
+		}
 		exec("ln -s ".$this->getRelativePathFromDeployedToRepository()." ".$this->getDeployedPathname(),$output,$exitcode);
 		return($exitcode);
 	}
+
+	/**
+	 * @return bool
+	 */
 	public function moveFileToRepository()
 	{
-		rename($this->getDeployedPathname(),$this->getRepositoryPathname());
+		if (!file_exists($this->getRepositoryPath()))
+		{
+			mkdir($this->getRepositoryPath(),0777,true);
+		}
+		return(rename($this->getDeployedPathname(),$this->getRepositoryPathname()));
 	}
 
 	/**
@@ -154,6 +166,10 @@ class Asset extends SplFileInfo
 	 */
 	public function copyToRepository()
 	{
+		if (!file_exists($this->getRepositoryPath()))
+		{
+			mkdir($this->getRepositoryPath(),0777,true);
+		}
 		return(copy($this->getDeployedPathname(),$this->getRepositoryPathname()));
 	}
 
@@ -165,6 +181,10 @@ class Asset extends SplFileInfo
 		if ($this->existsInDeployed() && $this->isLink())
 		{
 			unlink($this->getDeployedPathname());
+		}
+		if (!file_exists($this->getDeployedPath()))
+		{
+			mkdir($this->getDeployedPath(),0777,true);
 		}
 		return(copy($this->getRepositoryPathname(),$this->getDeployedPathname()));
 	}
