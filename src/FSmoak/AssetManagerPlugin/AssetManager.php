@@ -21,6 +21,7 @@ use Symfony\Component\Finder\Finder;
 use function substr;
 use Symfony\Component\Finder\SplFileInfo;
 use FSmoak\AssetManagerPlugin\Asset AS Asset;
+use Symfony\Component\Process\Process;
 
 /**
  * Class AssetManager
@@ -176,16 +177,18 @@ class AssetManager
 	 */
 	public function getRepositoryAssets()
 	{
-		$this->refreshRepository();
-		$finder = new Finder();
-		$finder->files()->in(AssetManager::CLONE_DIR);
-		try
+		if ($this->refreshRepository())
 		{
-			return(array_map(function(SplFileInfo $file){return($file->getFileInfo(Asset::class));},iterator_to_array($finder)));
-		}
-		catch (Exception $e)
-		{
-			return([]);
+			$finder = new Finder();
+			$finder->files()->in(AssetManager::CLONE_DIR);
+			try
+			{
+				return(array_map(function(SplFileInfo $file){return($file->getFileInfo(Asset::class));},iterator_to_array($finder)));
+			}
+			catch (Exception $e)
+			{
+				return([]);
+			}
 		}
 	}
 
@@ -195,16 +198,18 @@ class AssetManager
 	public function getDeletedAssets()
 	{
 		$deleted = [];
-		$this->refreshRepository();
-		$assets = $this->getRepositoryAssets();
-		foreach($assets AS $asset)
+		if ($this->refreshRepository())
 		{
-			if (!$asset->existsInDeployed())
+			$assets = $this->getRepositoryAssets();
+			foreach ($assets AS $asset)
 			{
-				$deleted[] = $asset;
+				if (!$asset->existsInDeployed())
+				{
+					$deleted[] = $asset;
+				}
 			}
+			return ($deleted);
 		}
-		return($deleted);
 	}
 
 	/**
@@ -213,13 +218,15 @@ class AssetManager
 	public function getChangedAssets()
 	{
 		$changed = [];
-		$this->refreshRepository();
-		$assets = $this->getLiveAssets();
-		foreach($assets AS $asset)
+		if ($this->refreshRepository())
 		{
-			if ($asset->hasChanged())
+			$assets = $this->getLiveAssets();
+			foreach ($assets AS $asset)
 			{
-				$changed[] = $asset;
+				if ($asset->hasChanged())
+				{
+					$changed[] = $asset;
+				}
 			}
 		}
 		return($changed);
@@ -232,17 +239,19 @@ class AssetManager
 	public function getUnchangedAssets($includeSymlinks = true)
 	{
 		$unchanged = [];
-		$this->refreshRepository();
-		$assets = $this->getLiveAssets();
-		foreach($assets AS $asset)
+		if ($this->refreshRepository())
 		{
-			if (!$asset->hasChanged())
+			$assets = $this->getLiveAssets();
+			foreach ($assets AS $asset)
 			{
-				if (!$includeSymlinks && $asset->isLink())
+				if (!$asset->hasChanged())
 				{
-					continue;
+					if (!$includeSymlinks && $asset->isLink())
+					{
+						continue;
+					}
+					$unchanged[] = $asset;
 				}
-				$unchanged[] = $asset;
 			}
 		}
 		return($unchanged);
@@ -260,7 +269,7 @@ class AssetManager
 		}
 		foreach($assets AS $asset)
 		{
-			exec("git -C " . AssetManager::CLONE_DIR . " rm " . $asset->getDeployedPathname(), $output, $exitcode);
+			$this->command("git -C " . AssetManager::CLONE_DIR . " rm " . $asset->getDeployedPathname());
 		}
 		$this->commitRepository();
 		return($this);
@@ -297,13 +306,13 @@ class AssetManager
 	
 	public function commitRepository()
 	{
-		exec("git -C ".self::getCloneDir()->path." add .");
-		exec("git -C ".self::getCloneDir()->path." commit -a -m '".date("Y-m-d H:i:s",time())."'");
+		$this->command("git -C ".self::getCloneDir()->path." add .");
+		$this->command("git -C ".self::getCloneDir()->path." commit -a -m '".date("Y-m-d H:i:s",time())."'");
 	}
 
 	public function pushRepository()
 	{
-		exec("git -C ".self::getCloneDir()->path." push origin ".$this->getConfig()->getEnvironment());
+		$this->command("git -C ".self::getCloneDir()->path." push origin ".$this->getConfig()->getEnvironment());
 	}
 
 	/**
@@ -318,20 +327,21 @@ class AssetManager
 		if ($repository = $this->getConfig()->getRepository())
 		{
 			$cloneDir = self::getCloneDir();
-			exec("git ls-remote -h " . $cloneDir->path, $output, $exitcode);
-			if ($exitcode != 0)
+			$process = $this->command("git ls-remote -h " . $cloneDir->path);
+			if ($process->getExitCode() != 0)
 			{
-				$this->getIo()->write("<error>Local working copy does not exist!</error> <info>Cloning from ".$repository." to ".$cloneDir->path.".</info>");
-				exec("git clone ".$repository." ".$cloneDir->path);
+				$this->getIo()->write("<warning>Local working copy does not exist!</warning>\n<info>Cloning from ".$repository." to ".$cloneDir->path.".</info>");
+				$this->command("git clone ".$repository." ".$cloneDir->path);
 			}
-			exec("git -C ".$cloneDir->path." pull origin ".$this->getConfig()->getEnvironment(),$output,$exitcode);
-			if ($exitcode != 0)
+			$process = $this->command("git -C ".$cloneDir->path." clean -f -d");
+			$process = $this->command("git -C ".$cloneDir->path." pull origin ".$this->getConfig()->getEnvironment());
+			if ($process->getExitCode() != 0)
 			{
-				$this->getIo()->write("<error>Environment branch does not exist!</error> <info>Creating new Branch ".$this->getConfig()->getEnvironment().".</info>");
-				exec("git -C ".$cloneDir->path." branch ".$this->getConfig()->getEnvironment());
+				$this->getIo()->write("<warning>Environment branch does not exist!</warning>\n<info>Creating new Branch ".$this->getConfig()->getEnvironment().".</info>");
+				$this->command("git -C ".$cloneDir->path." branch ".$this->getConfig()->getEnvironment());
 			}
-			exec("git -C ".$cloneDir->path." checkout ".$this->getConfig()->getEnvironment(),$output,$exitcode);
-			if ($exitcode == 0)
+			$process = $this->command("git -C ".$cloneDir->path." checkout ".$this->getConfig()->getEnvironment()." -f");
+			if ($process->getExitCode() == 0)
 			{
 				$this->refreshRepositoryOnce = true;
 				return (TRUE);
@@ -350,5 +360,46 @@ class AssetManager
 			mkdir(AssetManager::CLONE_DIR);
 		}
 		return(dir(AssetManager::CLONE_DIR));
+	}
+
+	/**
+	 * @param string $command
+	 * @return \Symfony\Component\Process\Process
+	 */
+	private function command($command)
+	{
+		$indent = str_repeat(" ",4);
+		$io = $this->getIO();
+		$io->write("<warning>$</warning>\e[4m " . $command."\e[0m", TRUE);
+		$process = new Process($command);
+		$process
+			->setTty(false)
+			->setTimeout(null)
+			->run(function($type, $buffer) use ($io,$indent) {
+				$io->write("\x0D",false);
+				$io->write("\x1B[2K",false);
+				$buffer = explode("\n",trim($buffer));
+				$output = $indent.end($buffer);
+				if (Process::ERR === $type)
+				{
+					$io->write($output, false);
+				}
+				else
+				{
+					$io->write($output, false);
+				}
+			});
+		$io->write("",true);
+		
+		$io->write($indent,false);
+		if ($process->getExitCode())
+		{
+			$io->write("<error>ExitCode: ".$process->getExitCode()."</error>", TRUE);
+		}
+		else
+		{
+			$io->write("<comment>ExitCode: ".$process->getExitCode()."</comment>", TRUE);
+		}
+		return ($process);
 	}
 }
