@@ -17,6 +17,7 @@ use Composer\Composer;
 use Composer\IO\IOInterface;
 use function file_exists;
 use function mkdir;
+use function str_repeat;
 use Symfony\Component\Finder\Finder;
 use function substr;
 use Symfony\Component\Finder\SplFileInfo;
@@ -368,30 +369,36 @@ class AssetManager
 	 */
 	private function command($command)
 	{
-		$indent = str_repeat(" ",4);
 		$io = $this->getIO();
+		
+		$indent = str_repeat(" ",4);
+		$dots = 0;
+		$up = "\e[1A";
+		$clear = "\e[2K";
+		
 		$io->write("<warning>$</warning>\e[4m " . $command."\e[0m", TRUE);
 		$process = new Process($command);
+		$io->write(str_repeat("\n",2),false); //2 newline because process callback will move 2 lines up and clear first
 		$process
 			->setTty(false)
 			->setTimeout(null)
-			->run(function($type, $buffer) use ($io,$indent) {
-				$io->write("\x0D",false);
-				$io->write("\x1B[2K",false);
+			->run(function($type, $buffer) use ($io,$indent,&$dots,$up,$clear) {
+				$io->write(str_repeat($up.$clear,2),false);
 				$buffer = explode("\n",trim($buffer));
 				$output = $indent.end($buffer);
 				if (Process::ERR === $type)
 				{
-					$io->write($output, false);
+					$io->write($output, true);
 				}
 				else
 				{
-					$io->write($output, false);
+					$io->write($output, true);
 				}
+				$dots++;
+				if ($dots >= 4) $dots=0;
+				$io->write($indent.str_repeat(".",$dots).str_repeat(" ",4-$dots), true);
 			});
-		$io->write("",true);
-		
-		$io->write($indent,false);
+		$io->write($up.$clear.$indent,false);
 		if ($process->getExitCode())
 		{
 			$io->write("<error>ExitCode: ".$process->getExitCode()."</error>", TRUE);
