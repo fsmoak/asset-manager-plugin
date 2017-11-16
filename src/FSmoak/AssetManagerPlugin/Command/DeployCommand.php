@@ -55,6 +55,7 @@ class DeployCommand extends AbstractCommand
 			foreach ($repositoryAssets AS $asset)
 			{
 				$io->write(" * " . $asset->getDeployedPathname());
+				usleep(1);
 			}
 			if (
 				$input->getOption("force") ||
@@ -70,11 +71,11 @@ class DeployCommand extends AbstractCommand
 						switch ($config->getMethod())
 						{
 							case AssetManager::METHOD_SYMLINK:
-								$io->write("<info>move (changed to symlink)</info>");
+								$io->write("<info>symlink</info>");
 								$asset->symlink(FALSE, TRUE);
 								break;
 							case AssetManager::METHOD_COPY:
-								$io->write("<info>copy (changed to copy)</info>");
+								$io->write("<info>copy</info>");
 								$asset->copyToDeployed();
 								break;
 						}

@@ -56,6 +56,7 @@ class CopyCommand extends AbstractCommand
 			foreach ($unchangedAssets AS $asset)
 			{
 				$io->write(" * " . $asset->getRepositoryPathname()." => ".$asset->getDeployedPathname());
+				usleep(1);
 			}
 			if (
 				$input->getOption("force") ||

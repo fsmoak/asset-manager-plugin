@@ -56,6 +56,7 @@ class SymlinkCommand extends AbstractCommand
 			foreach ($unchangedAssets AS $asset)
 			{
 				$io->write(" * " . $asset->getRelativePathname()." => ".$asset->getRelativePathFromDeployedToRepository());
+				usleep(1);
 			}
 			if (
 				$input->getOption("force") ||
