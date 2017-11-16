@@ -55,8 +55,8 @@ class CopyCommand extends AbstractCommand
 			$io->write("<info>The following assets will replaced with copies from the repository:</info>");
 			foreach ($unchangedAssets AS $asset)
 			{
-				$io->write(" * " . $asset->getRepositoryPathname()." => ".$asset->getDeployedPathname());
-				usleep(1);
+				$io->write(" * <info>" . $asset->getRepositoryPathname()."</info> => <comment>".$asset->getDeployedPathname()."</comment>");
+				$this->massOutputSleepFix();
 			}
 			if (
 				$input->getOption("force") ||

@@ -50,4 +50,12 @@ abstract class AbstractCommand extends BaseCommand
 		}
 		return($this->getAssetManager());
 	}
+
+	/**
+	 * Sleep Function to fix Output of very much text in a loop
+	 */
+	public function massOutputSleepFix()
+	{
+		usleep(10000);
+	}
 }

@@ -54,7 +54,7 @@ class CommitCommand extends AbstractCommand
 			foreach ($deletedAssets AS $asset)
 			{
 				$io->write(" * " . $asset->getRelativePathname());
-				usleep(1);
+				$this->massOutputSleepFix();
 			}
 			if (
 				$input->getOption("force") ||
@@ -72,7 +72,7 @@ class CommitCommand extends AbstractCommand
 			foreach ($changedAssets AS $asset)
 			{
 				$io->write(" * " . $asset->getRelativePathname());
-				usleep(1);
+				$this->massOutputSleepFix();
 			}
 			if (
 				$input->getOption("force") ||

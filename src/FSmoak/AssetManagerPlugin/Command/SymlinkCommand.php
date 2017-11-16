@@ -55,8 +55,8 @@ class SymlinkCommand extends AbstractCommand
 			$io->write("<info>The following assets will replaced with symlinks:</info>");
 			foreach ($unchangedAssets AS $asset)
 			{
-				$io->write(" * " . $asset->getRelativePathname()." => ".$asset->getRelativePathFromDeployedToRepository());
-				usleep(1);
+				$io->write(" * <info>" . $asset->getRelativePathname()."</info> => <comment>".$asset->getRelativePathFromDeployedToRepository()."</comment>");
+				$this->massOutputSleepFix();
 			}
 			if (
 				$input->getOption("force") ||

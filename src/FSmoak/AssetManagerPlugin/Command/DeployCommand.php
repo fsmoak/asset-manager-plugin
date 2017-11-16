@@ -55,7 +55,7 @@ class DeployCommand extends AbstractCommand
 			foreach ($repositoryAssets AS $asset)
 			{
 				$io->write(" * " . $asset->getDeployedPathname());
-				usleep(1);
+				$this->massOutputSleepFix();
 			}
 			if (
 				$input->getOption("force") ||
