@@ -18,6 +18,7 @@ use Composer\IO\IOInterface;
 use function file_exists;
 use function mkdir;
 use function str_repeat;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Finder\Finder;
 use function substr;
 use Symfony\Component\Finder\SplFileInfo;
@@ -378,12 +379,12 @@ class AssetManager
 		
 		$io->write("<warning>$</warning>\e[4m " . $command."\e[0m", TRUE);
 		$process = new Process($command);
-		$io->write(str_repeat("\n",2),false); //2 newline because process callback will move 2 lines up and clear first
+		if (!in_array("--ansi",$_SERVER["argv"])) $io->write(str_repeat("\n",2),false); //2 newline because process callback will move 2 lines up and clear first
 		$process
 			->setTty(false)
 			->setTimeout(null)
 			->run(function($type, $buffer) use ($io,$indent,&$dots,$up,$clear) {
-				$io->write(str_repeat($up.$clear,2),false);
+				if (!in_array("--ansi",$_SERVER["argv"])) $io->write(str_repeat($up.$clear,2),false);
 				$buffer = explode("\n",trim($buffer));
 				$output = $indent.end($buffer);
 				if (Process::ERR === $type)
@@ -396,9 +397,9 @@ class AssetManager
 				}
 				$dots++;
 				if ($dots >= 4) $dots=0;
-				$io->write($indent.str_repeat(".",$dots).str_repeat(" ",4-$dots), true);
+				if (!in_array("--ansi",$_SERVER["argv"])) $io->write($indent.str_repeat(".",$dots).str_repeat(" ",4-$dots), true);
 			});
-		$io->write($up.$clear.$indent,false);
+		if (!in_array("--ansi",$_SERVER["argv"])) $io->write($up.$clear.$indent,false);
 		if ($process->getExitCode())
 		{
 			$io->write("<error>ExitCode: ".$process->getExitCode()."</error>", TRUE);
