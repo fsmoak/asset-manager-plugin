@@ -1,3 +1,8 @@
+Maintenance Notice
+==================
+**This Project is not maintained anymore - please use with caution!**
+
+
 Asset-Manager-Plugin for Composer
 =================================
 
@@ -93,4 +98,4 @@ Configuration for the local environment.
 Authors
 -------
 
-- FSmoak  | [GitHub](https://github.com/fsmoak)  | <marieschreiber84@gmail.com> | [www.fluidweb.de](https://www.fluidweb.de)
+- FSmoak  | [GitHub](https://github.com/fsmoak)  | <marieschreiber84@gmail.com>
